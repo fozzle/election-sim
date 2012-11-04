@@ -81,18 +81,18 @@ class ElectionSim(object):
             obama_box.connect('toggled', self.winner_determined)
             obama_label = gtk.Label('50%')
             obama_label.set_name('%s_obama_percent' % norm)
-            mccain_box = gtk.CheckButton(label='McCain')
-            mccain_box.set_name('%s_mccain' % norm)
-            mccain_box.connect('toggled', self.winner_determined)
-            mccain_label = gtk.Label('50%')
-            mccain_label.set_name('%s_mccain_percent' % norm)
+            romney_box = gtk.CheckButton(label='Romney')
+            romney_box.set_name('%s_romney' % norm)
+            romney_box.connect('toggled', self.winner_determined)
+            romney_label = gtk.Label('50%')
+            romney_label.set_name('%s_romney_percent' % norm)
             sub_table.attach(obama_box, 0, 1, 0, 1)
             sub_table.attach(obama_label, 1, 2, 0, 1)
-            sub_table.attach(mccain_box, 0, 1, 1, 2)
-            sub_table.attach(mccain_label, 1, 2, 1, 2)
+            sub_table.attach(romney_box, 0, 1, 1, 2)
+            sub_table.attach(romney_label, 1, 2, 1, 2)
             table.attach(sub_table, 1, 2, 1, 2)
             table.attach(slider, 1, 2, 0, 1)
-            self.state_widgets[norm] = (slider, obama_box, obama_label, mccain_box, mccain_label)
+            self.state_widgets[norm] = (slider, obama_box, obama_label, romney_box, romney_label)
             self.state_table.attach(table, idx/10, idx/10+1, idx % 10, idx % 10 + 1)
         self.state_table.show_all()
     
@@ -106,7 +106,7 @@ class ElectionSim(object):
         if not self.update:
             return
         data = {}
-        for slider, obama_box, obama_label, mccain_box, mccain_label in self.state_widgets.itervalues():
+        for slider, obama_box, obama_label, romney_box, romney_label in self.state_widgets.itervalues():
             data['_'.join(slider.get_name().rsplit('_')[:-1])] = slider.get_value()
         self.pipe.send(data)
 
@@ -116,7 +116,7 @@ class ElectionSim(object):
         while self.pipe.poll():
             result = self.pipe.recv()
         self.wTree.get_widget('obama_count').set_text("%s%%" % int(100 * float(result[0])/SIMULATION_COUNT))
-        self.wTree.get_widget('mccain_count').set_text("%s%%" % int(100 * float(result[1])/SIMULATION_COUNT))
+        self.wTree.get_widget('romney_count').set_text("%s%%" % int(100 * float(result[1])/SIMULATION_COUNT))
         return True
     
     def winner_determined(self, widget):
@@ -145,8 +145,8 @@ class ElectionSim(object):
         self.update = False
         value = widget.get_value()
         self.wTree.get_widget('overall_obama').set_text('%s%%' % int(value))
-        self.wTree.get_widget('overall_mccain').set_text('%s%%' % (100 - int(value)))
-        for slider, obama_box, obama_label, mccain_box, mccain_label in self.state_widgets.itervalues():
+        self.wTree.get_widget('overall_romney').set_text('%s%%' % (100 - int(value)))
+        for slider, obama_box, obama_label, romney_box, romney_label in self.state_widgets.itervalues():
             if slider.get_property('sensitive'):
                 slider.set_value(value)
         self.update = True
@@ -155,31 +155,31 @@ class ElectionSim(object):
     def reset(self, widget):
         self.update = False
         self.wTree.get_widget('overall_slider').set_value(50)
-        for slider, obama_box, obama_label, mccain_box, mccain_label in self.state_widgets.itervalues():
+        for slider, obama_box, obama_label, romney_box, romney_label in self.state_widgets.itervalues():
             slider.set_sensitive(True)
             slider.set_value(50)
             obama_box.set_sensitive(True)
-            mccain_box.set_sensitive(True)
+            romney_box.set_sensitive(True)
             obama_box.set_active(False)
-            mccain_box.set_active(False)
+            romney_box.set_active(False)
         self.update = True
         self.update_projection()
     
     def save(self, widget):
         data = {}
         data['__all__'] = self.wTree.get_widget('overall_slider').get_value()
-        for slider, obama_box, obama_label, mccain_box, mccain_label in self.state_widgets.itervalues():
+        for slider, obama_box, obama_label, romney_box, romney_label in self.state_widgets.itervalues():
             name = '_'.join(slider.get_name().rsplit('_')[:-1])
-            data[name] = (slider.get_value(), obama_box.get_active(), mccain_box.get_active())
+            data[name] = (slider.get_value(), obama_box.get_active(), romney_box.get_active())
         pickle.dump(data, open('data.txt', 'w'))
     
     def load(self, widget):
         data = pickle.load(open('data.txt'))
         self.wTree.get_widget('overall_slider').set_value(data.pop('__all__', 50))
-        for name, (value, obama, mccain) in data.iteritems():
+        for name, (value, obama, romney) in data.iteritems():
             self.state_widgets[name][0].set_value(value)
             self.state_widgets[name][1].set_active(obama)
-            self.state_widgets[name][3].set_active(mccain)
+            self.state_widgets[name][3].set_active(romney)
     
     def quit(self, *args, **kwargs):
         gtk.main_quit()

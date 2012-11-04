@@ -80,11 +80,11 @@
                 <child>
                   <widget class="GtkLabel" id="label2">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">McCain:</property>
+                    <property name="label" translatable="yes">Romney:</property>
                   </widget>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="mccain_count">
+                  <widget class="GtkLabel" id="romney_count">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">0</property>
                   </widget>
@@ -129,7 +129,7 @@
           <widget class="GtkHBox" id="hbox2">
             <property name="visible">True</property>
             <child>
-              <widget class="GtkLabel" id="overall_mccain">
+              <widget class="GtkLabel" id="overall_romney">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">50%</property>
               </widget>
